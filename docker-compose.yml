@@ -1,0 +1,36 @@
+services:
+  db:
+    image: postgres:16-alpine
+    shm_size: 512mb
+    restart: unless-stopped
+    ports:
+      - 5432:5432
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_USER=avro
+      - POSTGRES_PASSWORD=avro
+      - POSTGRES_DB=avro
+    networks:
+      - main
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      target: dev
+    volumes:
+      - ./backend:/home/app
+    ports:
+      - 3000:3000
+    networks:
+      - main
+    depends_on:
+      - db
+    command: npx nest start --watch
+
+volumes:
+  db_data:
+
+networks:
+  main:
