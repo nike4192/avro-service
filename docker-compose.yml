@@ -29,6 +29,21 @@ services:
       - db
     command: npx nest start --watch
 
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      target: dev
+    volumes:
+      - ./frontend:/home/app
+    ports:
+      - 8000:8000
+    networks:
+      - main
+    depends_on:
+      - backend
+    command: npx vite --host 0.0.0.0 --port 8000
+
 volumes:
   db_data:
 

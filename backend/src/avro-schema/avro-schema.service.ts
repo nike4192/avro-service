@@ -3,6 +3,7 @@ import { BadRequestException, Injectable, NotFoundException } from '@nestjs/comm
 import { CreateAvroSchemaDto } from './dto/create-avro-schema.dto';
 import { PrismaService } from '../prisma/prisma.service';
 import { AvroSchemaVersion } from '@prisma/client';
+import { UpdateAvroSchemaDto } from './dto/update-avro-schema.dto'
 
 @Injectable()
 export class AvroSchemaService {
@@ -39,12 +40,12 @@ export class AvroSchemaService {
 
     const latestVersionNumber = Math.max(
       0,
-      ...avroSchema.versions.map(v => v.version)
+      ...avroSchema.versions.map(v => v.number)
     );
 
     if (latestVersionNumber) {
       const latestVersion = avroSchema.versions.find(
-        v => v.version === latestVersionNumber
+        v => v.number === latestVersionNumber
       );
 
       const delta = jsondiffpatch.diff(latestVersion.schema, schema);
@@ -59,11 +60,11 @@ export class AvroSchemaService {
         baseId: avroSchema.id,
         schema,
         createdById: userId,
-        version: latestVersionNumber + 1,
+        number: latestVersionNumber + 1,
       },
       select: {
         id: true,
-        version: true,
+        number: true,
       }
     });
   }
@@ -77,7 +78,7 @@ export class AvroSchemaService {
         versions: {
           select: {
             id: true,
-            version: true,
+            number: true,
           }
         }
       }
@@ -100,7 +101,7 @@ export class AvroSchemaService {
           name: schemaName,
         },
         createdById: userId,
-        version
+        number: version
       }
     });
   }
@@ -125,7 +126,7 @@ export class AvroSchemaService {
         versions: {
           select: {
             id: true,
-            version: true
+            number: true
           }
         }
       }
@@ -149,7 +150,7 @@ export class AvroSchemaService {
           name: schemaName,
         },
         createdById: userId,
-        version
+        number: version
       },
       select: {
         id: true
@@ -190,7 +191,7 @@ export class AvroSchemaService {
       },
       select: {
         id: true,
-        version: true
+        number: true
       }
     });
   }
@@ -198,7 +199,7 @@ export class AvroSchemaService {
   async getLatestVersionNumber(userId: string, schemaName: string) {
     const latestVersion = await this.prisma.avroSchemaVersion.aggregate({
       _max: {
-        version: true
+        number: true
       },
       where: {
         base: {
@@ -208,7 +209,7 @@ export class AvroSchemaService {
       }
     });
 
-    return latestVersion._max.version;
+    return latestVersion._max.number;
   }
 
   async findLatestVersions(userId: string, schemaName: string): Promise<AvroSchemaVersion> {
@@ -224,7 +225,7 @@ export class AvroSchemaService {
           name: schemaName,
         },
         createdById: userId,
-        version: latestVersionNumber
+        number: latestVersionNumber
       }
     });
   }
@@ -237,5 +238,22 @@ export class AvroSchemaService {
         id: latestVersion.id
       },
     })
+  }
+
+  async update(userId: string, schemaId: string, updateAvroSchemaDto: UpdateAvroSchemaDto) {
+    return this.prisma.avroSchema.update({
+      where: {
+        id: schemaId
+      },
+      data: updateAvroSchemaDto,
+      include: {
+        versions: {
+          select: {
+            id: true,
+            number: true
+          }
+        }
+      }
+    });
   }
 }

@@ -33,12 +33,12 @@ model AvroSchema {
 model AvroSchemaVersion {
   id          String     @id @default(uuid())
   schema      Json
-  version     Int
+  number      Int
   createdAt   DateTime   @default(now())
   createdBy   User       @relation(fields: [createdById], references: [id])
   createdById String
   base        AvroSchema @relation(fields: [baseId], references: [id], onDelete: Cascade)
   baseId      String
 
-  @@unique([createdById, baseId, version])
+  @@unique([createdById, baseId, number])
 }

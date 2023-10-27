@@ -3,6 +3,7 @@ import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import * as cookieParser from 'cookie-parser';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import * as process from 'process'
 
 const PORT = 3000;
 
@@ -21,6 +22,11 @@ async function bootstrap() {
 
   app.useGlobalPipes(new ValidationPipe());
   app.use(cookieParser());
+  app.enableCors({
+    credentials: true,
+    origin: process.env.CORS_ORIGIN
+  });
+
   await app.listen(PORT);
 }
 

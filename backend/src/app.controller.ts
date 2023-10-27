@@ -8,6 +8,7 @@ import { UserService } from './user/user.service';
 import { Public } from './auth/guards/public.guard';
 import { ApiBody, ApiCookieAuth, ApiOperation, ApiProperty, ApiTags } from '@nestjs/swagger';
 import { SchemaObject } from '@nestjs/swagger/dist/interfaces/open-api-spec.interface';
+import { OkResponseBody } from './constants'
 
 const AUTH_LOGIN_SCHEMA: SchemaObject = {
   type: 'object',
@@ -41,7 +42,16 @@ export class AppController {
     res.cookie('auth_cookie', { token }, { httpOnly: true });
     res.status(HttpStatus.CREATED);
 
-    return 'Authorized';
+    return OkResponseBody;
+  }
+
+  @ApiOperation({ summary: 'Logout', tags: ['auth'] })
+  @Post('auth/logout')
+  async logout(@Request() req, @Res({ passthrough: true }) res) {
+    res.clearCookie('auth_cookie', { httpOnly: true });
+    res.status(HttpStatus.OK);
+
+    return OkResponseBody;
   }
 
   @ApiOperation({ summary: 'Profile', tags: ['profile'] })

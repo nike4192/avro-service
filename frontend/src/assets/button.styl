@@ -1,0 +1,21 @@
+.icon-button
+  float left
+  padding 6px
+  width 36px
+  height 36px
+  display inline-block
+  border-radius 6px
+
+  &:hover .icon path
+    color: var(--color-text-1)
+
+  &.red:hover .icon path
+    color: var(--vt-c-red)
+
+  .icon
+    float left
+    display inline-block
+    width 24px
+    path
+      color var(--color-text-2)
+      transition color 120ms

@@ -7,12 +7,13 @@ import {
   Delete,
   Req,
   UseGuards,
-  NotFoundException,
-} from '@nestjs/common';
+  NotFoundException, Patch
+} from '@nestjs/common'
 import { AvroSchemaService,  } from './avro-schema.service';
 import { CreateAvroSchemaDto } from './dto/create-avro-schema.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { ApiBearerAuth, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
+import { UpdateAvroSchemaDto } from './dto/update-avro-schema.dto'
 
 const ApiParamSchemaName = () => ApiParam({ name: 'schemaName', type: 'string', example: 'schema-1' });
 const ApiParamVersion = () => ApiParam({ name: 'version', type: 'string', example: '1' });
@@ -36,6 +37,21 @@ export class AvroSchemaController {
       req.user.id,
       schemaName,
       createAvroSchemaDto
+    );
+  }
+
+  @ApiParamSchemaName()
+  @ApiOperation({ summary: 'Update schema' })
+  @Patch(':id')
+  async update(
+    @Req() req,
+    @Param('id') id: string,
+    @Body() updateAvroSchemaDto: UpdateAvroSchemaDto
+  ) {
+    return await this.avroSchemaService.update(
+      req.user.id,
+      id,
+      updateAvroSchemaDto
     );
   }
 
