@@ -1,0 +1,35 @@
+font-groups = {
+  JetBrainsMono: {
+    path: 'JetBrainsMono',
+    prefix: 'JetBrainsMono-',
+    format: 'ttf',
+    fonts: (
+      { file: 'Bold', font-weight: 700, font-style: normal } \
+      { file: 'BoldItalic', font-weight: 700, font-style: italic } \
+      { file: 'ExtraBold', font-weight: 800, font-style: normal } \
+      { file: 'ExtraBoldItalic', font-weight: 800, font-style: italic } \
+      { file: 'ExtraLight', font-weight: 200, font-style: normal } \
+      { file: 'ExtraLightItalic', font-weight: 200, font-style: italic } \
+      { file: 'Italic', font-weight: 400, font-style: italic } \
+      { file: 'Light', font-weight: 300, font-style: normal } \
+      { file: 'LightItalic', font-weight: 300, font-style: italic } \
+      { file: 'Medium', font-weight: 500, font-style: normal } \
+      { file: 'MediumItalic', font-weight: 500, font-style: italic } \
+      { file: 'Regular', font-weight: 400, font-style: normal } \
+      { file: 'SemiBold', font-weight: 600, font-style: normal } \
+      { file: 'SemiBoldItalic', font-weight: 600, font-style: italic } \
+      { file: 'Thin', font-weight: 100, font-style: normal } \
+      { file: 'ThinItalic', font-weight: 100, font-style: italic }
+    )
+  }
+}
+
+for font-family, fg in font-groups
+  for f in fg.fonts
+    f.src = url(pathjoin('./fonts/', fg.path, fg.prefix + f.file + '.' + fg.format))
+    f = remove(f, 'file')
+
+    @font-face
+      font-family font-family
+      for key, value in f
+        {key}: value

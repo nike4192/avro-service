@@ -41,6 +41,7 @@ const router = createRouter({
 router.beforeEach(async (to, from, next) => {
   const store = useProfileStore();
   const { profile } = storeToRefs(store);
+
   if (to.name !== 'auth-login' && !profile.value) {
     await store.fetchProfile();
     if (!profile.value) {
@@ -50,6 +51,20 @@ router.beforeEach(async (to, from, next) => {
     } else {
       next();
     }
+  } else if (to.name == 'auth-login' && !profile.value) {
+    await store.fetchProfile();
+    if (profile.value) {
+      if (to.query.callback) {
+        await next({
+          path: to.query.callback as string
+        });
+      } else {
+        await next({
+          name: 'home'
+        });
+      }
+    } else {}
+    next();
   } else {
     next();
   }

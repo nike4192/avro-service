@@ -21,13 +21,14 @@ services:
       target: dev
     volumes:
       - ./backend:/home/app
+      - ./shared:/home/shared
     ports:
       - 3000:3000
     networks:
       - main
     depends_on:
       - db
-    command: npx nest start --watch
+    command: npx nest start --watch --entryFile=/app/src/main.js
 
   frontend:
     build:
@@ -36,6 +37,7 @@ services:
       target: dev
     volumes:
       - ./frontend:/home/app
+      - ./shared:/home/shared
     ports:
       - 8000:8000
     networks:

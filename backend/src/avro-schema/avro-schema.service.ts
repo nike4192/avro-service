@@ -1,9 +1,10 @@
 import * as jsondiffpatch from 'jsondiffpatch';
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateAvroSchemaDto } from './dto/create-avro-schema.dto';
-import { PrismaService } from '../prisma/prisma.service';
+import { PrismaService } from '@/prisma/prisma.service';
 import { AvroSchemaVersion } from '@prisma/client';
 import { UpdateAvroSchemaDto } from './dto/update-avro-schema.dto'
+import { Type } from '~shared/avro/types'
 
 @Injectable()
 export class AvroSchemaService {
@@ -53,6 +54,12 @@ export class AvroSchemaService {
       if (!delta) {
         throw new BadRequestException('schema is the same as in the previous version');
       }
+    }
+
+    const errors = Type.validate(schema);
+
+    if (errors.length) {
+      throw new BadRequestException({ errors });
     }
 
     return this.prisma.avroSchemaVersion.create({
@@ -253,6 +260,14 @@ export class AvroSchemaService {
             number: true
           }
         }
+      }
+    });
+  }
+
+  async deleteSchemaVersion(userId: string, versionId: string) {
+    return this.prisma.avroSchemaVersion.delete({
+      where: {
+        id: versionId
       }
     });
   }

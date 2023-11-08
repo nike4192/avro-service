@@ -11,6 +11,8 @@ export const alovaInstance = createAlova({
   // Request adapter, here we use fetch request adapter
   requestAdapter: GlobalFetch(),
 
+  localCache: null,
+
   async responded(response, config) {
     if (!response.ok) {
       // When an error is thrown here, it will enter the request failure interceptor

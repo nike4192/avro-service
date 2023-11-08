@@ -54,14 +54,4 @@ async function onLoginFormSubmit() {
 </template>
 
 <style lang='stylus'>
-.card
-  margin auto
-  padding 4rem 5rem
-  width 500px
-  height 400px
-  max-width 100vw
-  max-height 100vh
-  background-color var(--color-background-soft)
-  box-shadow var(--vt-shadow-2)
-  border-radius 8px
 </style>

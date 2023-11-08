@@ -15,12 +15,25 @@ const { selectedSchema, selectedVersion } = storeToRefs(store);
 
 function onSchemaClickHandle(schema) {
   if (schema.name !== selectedSchema.value?.name) {
-    router.push({
-      name: 'schemas',
-      params: {
-        schemaName: schema.name
-      }
-    });
+    const { versions } = schema;
+
+    if (versions && versions.length) {
+      const version = versions[versions.length - 1].number;
+      router.push({
+        name: 'versions',
+        params: {
+          schemaName: schema.name,
+          version
+        }
+      });
+    } else {
+      router.push({
+        name: 'schemas',
+        params: {
+          schemaName: schema.name,
+        }
+      });
+    }
   }
 }
 
@@ -36,9 +49,9 @@ function onVersionClickHandle(version) {
   }
 }
 
-watch(selectedVersion, () => {
-  console.log(props.schema, selectedVersion.value?.number);
-})
+// watch(selectedVersion, () => {
+//   console.log(props.schema, selectedVersion.value?.number);
+// })
 
 </script>
 
@@ -55,7 +68,6 @@ div.schema-panel-item(
       :selected='version.number === selectedVersion?.number'
     )
       | v{{ version.number }}
-    div.version +
 </template>
 
 <style lang='stylus'>
@@ -63,7 +75,7 @@ div.schema-panel-item(
   margin 12px
   padding 12px 18px
   border 1px solid var(--color-border)
-  border-radius 8px
+  border-radius 24px
   color var(--color-text)
   cursor default
   transition border 120ms
@@ -86,9 +98,9 @@ div.schema-panel-item(
     .version
       display inline-block
       margin-right 8px
-      padding 2px 8px
+      padding 4px 10px
       border 1px solid var(--color-border)
-      border-radius 4px
+      border-radius 16px
       line-height 1rem
 
       &[selected='true']

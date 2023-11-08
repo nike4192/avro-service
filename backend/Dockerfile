@@ -63,4 +63,4 @@ USER root
 COPY --chown=node:node --from=build /home/app/dist dist
 COPY --chown=node:node --from=build /home/app/node_modules node_modules
 
-CMD ["node", "dist/main.js"]
+CMD ["node", "dist/src/main.js"]

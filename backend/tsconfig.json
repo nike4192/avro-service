@@ -18,5 +18,9 @@
     "forceConsistentCasingInFileNames": false,
     "noFallthroughCasesInSwitch": false,
     "resolveJsonModule": true,  // TODO: Remove after remove avro-schema-example.json import
+    "paths": {
+      "@/*": ["./src/*"],
+      "~shared/*": ["./../shared/*"]
+    }
   }
 }

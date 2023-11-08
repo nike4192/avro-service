@@ -1,14 +1,10 @@
-import { ref, computed, watch } from 'vue'
+import { computed, ref, shallowRef, watch } from 'vue'
 import { defineStore } from 'pinia'
-import { alovaInstance } from '@/composables/alova';
+import { alovaInstance } from '@/composables/alova'
 import { useRoute } from 'vue-router'
-import { Type } from 'avsc'
+import type { Ref } from 'vue';
 
 export const useSchemaStore = defineStore('schema', () => {
-  const schemaData = alovaInstance.Get<[]>('/schema', {
-    credentials: 'include'
-  });
-
   const route = useRoute();
 
   const schemaList = ref([]);
@@ -19,36 +15,58 @@ export const useSchemaStore = defineStore('schema', () => {
     );
   });
 
-  const selectedVersion: null | any = ref(null);
+  const selectedType: Ref<any | null> = ref(null);
+  const selectedVersion: null | any = shallowRef(null);
 
   watch(
     () => [route.params.schemaName, route.params.version],
-    async () => {
-      const { schemaName, version } = route.params;
-      if (schemaName && version) {
-        const versionData = alovaInstance.Get(`/schema/${schemaName}/versions/${version}`, {
-          credentials: 'include'
-        });
-        const versionEntity = await versionData.send();
-        versionEntity.records = [];
-        Type.forSchema(versionEntity.schema, {
-          typeHook(schema, opts) {
-            if (schema && schema.type === 'record') {
-              versionEntity.records.push(schema);
-            }
-            return;
-          }
-        });
-        selectedVersion.value = versionEntity;
-      } else {
-        selectedVersion.value = null;
-      }
-  }, {
-    immediate: true
-  });
+    fetchSelectedVersion,
+    { immediate: true }
+  );
+
+  async function fetchSelectedVersion() {
+    const { schemaName, version } = route.params;
+    if (schemaName && version) {
+      const versionData = alovaInstance.Get(`/schema/${schemaName}/versions/${version}`, {
+        credentials: 'include'
+      });
+      selectedVersion.value = await versionData.send();
+    } else {
+      selectedVersion.value = null;
+    }
+    selectedType.value = null;
+  }
 
   async function fetchSchema() {
-    schemaList.value = await schemaData.send();
+    schemaList.value = await alovaInstance.Get<[]>('/schema', {
+      credentials: 'include'
+    }).send();
+  }
+
+  async function pushSchema(schema) {
+    await alovaInstance.Post(`/schema/${schema.name}/versions`, {
+      schema
+    }, {
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8'
+      },
+      credentials: 'include'
+    }).send();
+    await fetchSchema();
+  }
+
+  async function removeSchema(schema) {
+    await alovaInstance.Delete(`/schema/${schema.name}`, null, {
+      credentials: 'include'
+    }).send();
+    await fetchSchema();
+  }
+
+  async function removeSchemaVersion(version) {
+    await alovaInstance.Delete(`/schema/versions/${version.id}`, null, {
+      credentials: 'include'
+    }).send();
+    await fetchSchema();
   }
 
   async function updateSchema(schema) {
@@ -72,7 +90,11 @@ export const useSchemaStore = defineStore('schema', () => {
     schemaList,
     selectedSchema,
     selectedVersion,
+    selectedType,
     fetchSchema,
-    updateSchema
+    updateSchema,
+    pushSchema,
+    removeSchemaVersion,
+    removeSchema,
   }
 })

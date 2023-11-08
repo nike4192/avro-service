@@ -18,6 +18,18 @@
   --vt-c-green-dark: #33a06f;
   --vt-c-green-darker: #155f3e;
 
+  --vt-c-blue: #3b8eed;
+  --vt-c-blue-light: #549ced;
+  --vt-c-blue-lighter: #50a2ff;
+  --vt-c-blue-dark: #3468a3;
+  --vt-c-blue-darker: #255489;
+
+  --vt-c-yellow: #ffc517;
+  --vt-c-yellow-light: #ffe417;
+  --vt-c-yellow-lighter: #ffff17;
+  --vt-c-yellow-dark: #e0ad15;
+  --vt-c-yellow-darker: #bc9112;
+
   --vt-c-red: #ed3c50;
   --vt-c-red-light: #f43771;
   --vt-c-red-lighter: #fd1d7c;
@@ -29,9 +41,11 @@
   --vt-c-divider-dark-1: rgba(84, 84, 84, 0.65);
   --vt-c-divider-dark-2: rgba(84, 84, 84, 0.48);
 
+  --vt-c-text-light-half: #2c3e5088;
   --vt-c-text-light-1: var(--vt-c-indigo);
   --vt-c-text-light-2: rgba(60, 60, 60, 0.66);
   --vt-c-text-dark-1: var(--vt-c-white);
+  --vt-c-text-dark-half: rgba(235, 235, 235, 0.3);
   --vt-c-text-dark-2: rgba(235, 235, 235, 0.64);
 }
 
@@ -49,6 +63,7 @@
   --color-border-hover: var(--vt-c-divider-light-1);
 
   --color-heading: var(--vt-c-text-light-1);
+  --color-text-half: var(--vt-c-text-light-half);
   --color-text: var(--vt-c-text-light-1);
   --color-text-1: var(--vt-c-text-light-1);
   --color-text-2: var(--vt-c-text-light-2);
@@ -82,21 +97,23 @@
     --color-border-hover: var(--vt-c-divider-dark-1);
 
     --color-heading: var(--vt-c-text-dark-1);
+    --color-text-half: var(--vt-c-text-dark-half);
     --color-text: var(--vt-c-text-dark-2);
     --color-text-1: var(--vt-c-text-dark-1);
     --color-text-2: var(--vt-c-text-dark-2);
   }
 }
 
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-  margin: 0;
-  font-weight: normal;
-}
+/**,*/
+/**::before,*/
+/**::after {*/
+/*  box-sizing: border-box;*/
+/*  margin: 0;*/
+/*  font-weight: normal;*/
+/*}*/
 
 body {
+  margin: 0;
   min-height: 100vh;
   color: var(--color-text);
   background: var(--color-background);
@@ -126,4 +143,19 @@ h1 {
   line-height: 40px;
   font-size: 32px;
   font-weight: 600;
+}
+
+* {
+  .icon {
+    display: inline-block;
+    float: left;
+  }
+}
+
+.center {
+  margin: auto;
+}
+
+.color-half {
+  color: var(--color-text-half)
 }

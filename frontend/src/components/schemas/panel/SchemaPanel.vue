@@ -1,11 +1,11 @@
 <script setup lang='ts'>
 
-import style from '@/assets/button.styl'
+import '@/assets/button.styl'
 import { PlusIcon } from '@heroicons/vue/24/outline';
 import { useSchemaStore } from '@/stores/schema'
 import { onMounted } from 'vue'
 import { storeToRefs } from 'pinia'
-import SchemaPanelItem from '@/components/schemas/SchemaPanelItem.vue'
+import SchemaPanelItem from '@/components/schemas/panel/SchemaPanelItem.vue'
 import { useRouter } from 'vue-router'
 
 const router = useRouter();

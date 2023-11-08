@@ -115,6 +115,18 @@ export class AvroSchemaController {
     return schemaVersion;
   }
 
+  @ApiOperation({ summary: 'Delete specific version by uuid' })
+  @Delete('versions/:id')
+  async deleteSchemaVersion(@Req() req, @Param('id') id: string) {
+    const schemaVersion = await this.avroSchemaService.deleteSchemaVersion(req.user.id, id);
+
+    if (!schemaVersion) {
+      throw new NotFoundException();
+    }
+
+    return schemaVersion;
+  }
+
   @ApiOperation({ summary: 'Delete one schema with versions' })
   @ApiParamSchemaName()
   @Delete(':schemaName')
