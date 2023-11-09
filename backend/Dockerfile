@@ -14,7 +14,7 @@ ENV NODE_ENV dev
 
 # Copy source code into app folder
 COPY --chown=node:node ./backend /home/app
-ADD --chown=node:node ./shared /home/shared
+COPY --chown=node:node ./shared /home/shared
 
 # Set Docker as a non-root user
 USER root
@@ -36,9 +36,10 @@ ENV NODE_ENV production
 # In order to run `yarn build` we need access to the Nest CLI.
 # Nest CLI is a dev dependency.
 COPY --chown=node:node --from=dev /home/app/node_modules ./node_modules
+
 # Copy source code
 COPY --chown=node:node ./backend /home/app
-ADD --chown=node:node ./shared /home/shared
+COPY --chown=node:node ./shared /home/shared
 
 RUN yarn build
 

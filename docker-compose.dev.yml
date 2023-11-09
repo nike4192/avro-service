@@ -13,8 +13,8 @@ services:
   backend:
     env_file: '.env'  # pass variables to node.js
     build:
-      context: ./backend
-      dockerfile: Dockerfile
+      context: ./
+      dockerfile: ./backend/Dockerfile
       target: dev
     volumes:
       - ./backend:/home/app
@@ -30,19 +30,19 @@ services:
   frontend:
     env_file: '.env'  # pass variables to node.js
     build:
-      context: ./frontend
-      dockerfile: Dockerfile
+      context: ./
+      dockerfile: ./frontend/Dockerfile
       target: dev
     volumes:
       - ./frontend:/home/app
       - ./shared:/home/shared
     ports:
-      - ${FRONTEND_PORT}:${FRONTEND_PORT}
+      - ${FRONTEND_PORT}:5173
     networks:
       - main
     depends_on:
       - backend
-    command: npx vite --host 0.0.0.0 --port ${FRONTEND_PORT}
+    command: npx vite --host 0.0.0.0 --port 5173
 
 volumes:
   db_data:

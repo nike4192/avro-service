@@ -13,7 +13,8 @@ WORKDIR /home/app
 ENV NODE_ENV dev
 
 # Copy source code into app folder
-COPY --chown=node:node . .
+COPY --chown=node:node ./frontend /home/app
+COPY --chown=node:node ./shared /home/shared
 
 # Set Docker as a non-root user
 USER root
@@ -36,7 +37,8 @@ ENV NODE_ENV production
 # Nest CLI is a dev dependency.
 COPY --chown=node:node --from=dev /home/app/node_modules ./node_modules
 # Copy source code
-COPY --chown=node:node . .
+COPY --chown=node:node ./frontend /home/app
+COPY --chown=node:node ./shared /home/shared
 
 # Generate the production build. The build script runs "nest build" to compile the application.
 RUN yarn build-only
@@ -57,6 +59,7 @@ RUN apk add --no-cache libc6-compat
 
 # Copy only the necessary files
 COPY --chown=node:node --from=build /home/app/dist dist
+COPY ./frontend/nginx.conf /etc/nginx/conf.d/default.conf
 
 # Set Docker as non-root user
 USER root

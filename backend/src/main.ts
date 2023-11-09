@@ -5,24 +5,21 @@ import { ConfigService } from '@nestjs/config'
 import * as cookieParser from 'cookie-parser';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { LocalEnvironmentConfig } from '@/types'
-import { config } from 'dotenv';
-
-config();
+import { computeUrls } from '@/url.computed'
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   const configService = app.get(ConfigService<LocalEnvironmentConfig>);
 
-  const HOST = configService.get('BACKEND_HOST') ?? 'localhost';
-  const PORT = configService.get('BACKEND_PORT') ?? 3000;
-
-  const FRONTEND_HOST = configService.get('FRONTEND_HOST') ?? 'localhost';
-  const FRONTEND_PORT = configService.get('FRONTEND_PORT') ?? 8000;
+  const {
+    BACKEND_URL, BACKEND_PORT,
+    FRONTEND_URL, CORS_ORIGIN,
+  } = computeUrls(configService);
 
   const config = new DocumentBuilder()
     .setTitle('Avro Schema')
-    .addServer(`http://${HOST}:${PORT}`)
+    .addServer(BACKEND_URL.href)
     .setDescription('Avro Schema Registry')
     .setVersion('0.1')
     .build();
@@ -34,10 +31,13 @@ async function bootstrap() {
   app.use(cookieParser());
   app.enableCors({
     credentials: true,
-    origin: `http://${FRONTEND_HOST}${FRONTEND_PORT !== 80 ? ':' + FRONTEND_PORT : ''}`
+    origin: [
+      FRONTEND_URL.href.replace(/\/$/, ''),  // remove trailing slash
+      CORS_ORIGIN.split(' ')
+    ]
   });
 
-  await app.listen(PORT);
+  await app.listen(BACKEND_PORT);
 }
 
 bootstrap();

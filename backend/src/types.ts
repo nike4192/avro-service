@@ -1,4 +1,4 @@
-import { IsNumber, IsString } from 'class-validator'
+import { IsNumber, IsOptional, IsString } from 'class-validator'
 
 class RootEnvironmentConfig {
   @IsString()
@@ -8,9 +8,14 @@ class RootEnvironmentConfig {
   BACKEND_PORT: number;
 
   @IsString()
+  @IsOptional()
+  FRONTEND_PROTOCOL: string;
+
+  @IsString()
   FRONTEND_HOST: string;
 
   @IsNumber()
+  @IsOptional()
   FRONTEND_PORT: number;
 }
 
@@ -20,4 +25,7 @@ export class LocalEnvironmentConfig extends RootEnvironmentConfig {
 
   @IsString()
   JWT_EXPIRES_IN: string;
+
+  @IsString()
+  CORS_ORIGIN: string;
 }
