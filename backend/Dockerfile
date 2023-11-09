@@ -16,7 +16,7 @@ ENV NODE_ENV dev
 COPY --chown=node:node . .
 
 # Set Docker as a non-root user
-USER node
+USER root
 
 # Install dependencies
 RUN yarn --frozen-lockfile
@@ -39,7 +39,7 @@ COPY --chown=node:node --from=dev /home/app/node_modules ./node_modules
 COPY --chown=node:node . .
 
 # Set Docker as a non-root user
-USER node
+USER root
 
 # Install only the production dependencies and clean cache to optimize image size.
 RUN yarn --frozen-lockfile --production && yarn cache clean
@@ -60,6 +60,6 @@ COPY --chown=node:node --from=build /home/app/dist dist
 COPY --chown=node:node --from=build /home/app/node_modules node_modules
 
 # Set Docker as non-root user
-USER node
+USER root
 
 CMD ["node", "-r", "./tsconfig-paths-bootstrap.js", "dist/app/src/main.js"]
