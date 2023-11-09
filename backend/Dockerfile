@@ -38,6 +38,8 @@ COPY --chown=node:node --from=dev /home/app/node_modules ./node_modules
 # Copy source code
 COPY --chown=node:node . .
 
+RUN yarn build
+
 # Set Docker as a non-root user
 USER root
 
