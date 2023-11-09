@@ -39,7 +39,7 @@ COPY --chown=node:node --from=dev /home/app/node_modules ./node_modules
 COPY --chown=node:node . .
 
 # Generate the production build. The build script runs "nest build" to compile the application.
-# RUN yarn build-only
+RUN yarn build-only
 
 # Set Docker as a non-root user
 USER root
@@ -50,19 +50,17 @@ RUN yarn --frozen-lockfile --production && yarn cache clean
 #
 # 🚀 Production Server
 #
-FROM node:18-alpine as prod
+FROM nginx:stable-alpine as prod
 
 WORKDIR /home/app
 RUN apk add --no-cache libc6-compat
 
-# Set to production environment
-ENV NODE_ENV production
-
 # Copy only the necessary files
 COPY --chown=node:node --from=build /home/app/dist dist
-COPY --chown=node:node --from=build /home/app/node_modules node_modules
 
 # Set Docker as non-root user
 USER root
 
-CMD ["node", "dist/main.js"]
+EXPOSE 80
+
+CMD ["nginx", "-g", "daemon off;"]
