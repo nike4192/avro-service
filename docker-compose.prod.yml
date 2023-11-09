@@ -14,8 +14,8 @@ services:
   backend:
     env_file: '.env'  # pass variables to node.js
     build:
-      context: ./backend
-      dockerfile: Dockerfile
+      context: ./
+      dockerfile: ./backend/Dockerfile
       target: prod
     volumes:
       - ./backend:/home/app
