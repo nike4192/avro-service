@@ -39,7 +39,7 @@ COPY --chown=node:node --from=dev /home/app/node_modules ./node_modules
 COPY --chown=node:node . .
 
 # Generate the production build. The build script runs "nest build" to compile the application.
-RUN yarn build
+RUN yarn build-only
 
 # Set Docker as a non-root user
 USER node
