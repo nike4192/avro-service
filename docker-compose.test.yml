@@ -1,0 +1,51 @@
+services:
+  db:
+    image: postgres:16-alpine
+    shm_size: 512mb
+    restart: unless-stopped
+    ports:
+      - 5432:5432
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    networks:
+      - main
+
+  backend:
+    env_file: '.env'  # pass variables to node.js
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      target: dev
+    volumes:
+      - ./backend:/home/app
+      - ./shared:/home/shared
+    ports:
+      - ${BACKEND_PORT}:${BACKEND_PORT}
+    networks:
+      - main
+    depends_on:
+      - db
+    command: npx nest start --watch --entryFile=/app/src/main.js
+
+  frontend:
+    env_file: '.env'  # pass variables to node.js
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      target: dev
+    volumes:
+      - ./frontend:/home/app
+      - ./shared:/home/shared
+    ports:
+      - ${FRONTEND_PORT}:${FRONTEND_PORT}
+    networks:
+      - main
+    depends_on:
+      - backend
+    command: npx vite --host 0.0.0.0 --port ${FRONTEND_PORT}
+
+volumes:
+  db_data:
+
+networks:
+  main:

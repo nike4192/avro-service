@@ -7,10 +7,13 @@ import { AuthModule } from '@/auth/auth.module';
 import { UserModule } from '@/user/user.module';
 import { JwtAuthGuard } from '@/auth/guards/jwt-auth.guard';
 import { AvroSchemaModule } from '@/avro-schema/avro-schema.module';
+import { validate } from '@/env.validation'
 
 @Module({
   imports: [
-    ConfigModule.forRoot(),
+    ConfigModule.forRoot({
+      validate
+    }),
     AuthModule,
     UserModule,
     AvroSchemaModule
