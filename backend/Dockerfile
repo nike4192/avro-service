@@ -13,11 +13,8 @@ WORKDIR /home/app
 ENV NODE_ENV dev
 
 # Copy source code into app folder
-COPY --chown=node:node ./backend /home/app
-COPY --chown=node:node ./shared /home/shared
-
-# Set Docker as a non-root user
-USER root
+COPY ./backend /home/app
+COPY ./shared /home/shared
 
 # Install dependencies
 RUN yarn --frozen-lockfile
@@ -35,16 +32,13 @@ ENV NODE_ENV production
 
 # In order to run `yarn build` we need access to the Nest CLI.
 # Nest CLI is a dev dependency.
-COPY --chown=node:node --from=dev /home/app/node_modules ./node_modules
+COPY --from=dev /home/app/node_modules ./node_modules
 
 # Copy source code
-COPY --chown=node:node ./backend /home/app
-COPY --chown=node:node ./shared /home/shared
+COPY ./backend /home/app
+COPY ./shared /home/shared
 
 RUN yarn build
-
-# Set Docker as a non-root user
-USER root
 
 # Install only the production dependencies and clean cache to optimize image size.
 RUN yarn --frozen-lockfile --production && yarn cache clean
@@ -61,9 +55,6 @@ RUN apk add --no-cache libc6-compat
 ENV NODE_ENV production
 
 # Copy only the necessary files
-COPY --chown=node:node --from=build /home/app/node_modules node_modules
-
-# Set Docker as non-root user
-USER root
+COPY --from=build /home/app/node_modules node_modules
 
 CMD ["node", "-r", "./tsconfig-paths-bootstrap.js", "dist/app/src/main.js"]

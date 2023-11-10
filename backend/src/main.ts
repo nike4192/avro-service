@@ -13,7 +13,7 @@ async function bootstrap() {
   const configService = app.get(ConfigService<LocalEnvironmentConfig>);
 
   const {
-    BACKEND_URL, BACKEND_PORT,
+    BACKEND_URL,
     FRONTEND_URL, CORS_ORIGIN,
   } = computeUrls(configService);
 
@@ -37,7 +37,7 @@ async function bootstrap() {
     ]
   });
 
-  await app.listen(BACKEND_PORT);
+  await app.listen(3000);
 }
 
 bootstrap();
