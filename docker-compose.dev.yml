@@ -20,7 +20,7 @@ services:
       - ./backend:/home/app
       - ./shared:/home/shared
     ports:
-      - ${BACKEND_PORT}:${BACKEND_PORT}
+      - ${BACKEND_PORT}:3000
     networks:
       - main
     depends_on:
