@@ -32,7 +32,7 @@ ENV NODE_ENV production
 
 # In order to run `yarn build` we need access to the Nest CLI.
 # Nest CLI is a dev dependency.
-COPY --from=dev /home/app/node_modules /home/app/node_modules
+COPY --from=dev /home/app/node_modules ./node_modules
 
 # Copy source code
 COPY ./backend /home/app
@@ -55,6 +55,6 @@ RUN apk add --no-cache libc6-compat
 ENV NODE_ENV production
 
 # Copy only the necessary files
-COPY --from=build /home/app/node_modules /home/app/node_modules
+COPY --from=build /home/app/node_modules ./node_modules
 
 CMD ["node", "-r", "./tsconfig-paths-bootstrap.js", "dist/app/src/main.js"]
