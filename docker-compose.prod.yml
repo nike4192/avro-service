@@ -36,8 +36,8 @@ services:
       dockerfile: ./frontend/Dockerfile
       target: prod
     volumes:
-      - ./frontend:/home/app
       - ./shared:/home/shared
+      - ./frontend:/home/app
       - /home/app/node_modules
       - /home/app/dist
     ports:

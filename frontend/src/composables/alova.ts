@@ -4,10 +4,10 @@ import VueHook from 'alova/vue';
 
 const { BACKEND_PROTOCOL, BACKEND_HOST, BACKEND_PORT } = import.meta.env;
 
-const BACKEND_URL = new URL('http://localhost:3000');
+const BACKEND_URL = new URL('https://avro.coor.xyz');
 
 BACKEND_URL.protocol = BACKEND_PROTOCOL ?? BACKEND_URL.protocol;
-BACKEND_URL.host = BACKEND_HOST;
+BACKEND_URL.host = BACKEND_HOST ?? BACKEND_URL.protocol;
 BACKEND_URL.port = (
   BACKEND_PORT
     ? ([80, 443].includes(BACKEND_PORT) ? '' : BACKEND_PORT)
