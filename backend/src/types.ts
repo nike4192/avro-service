@@ -1,9 +1,14 @@
 import { IsNumber, IsOptional, IsString } from 'class-validator'
 
 class RootEnvironmentConfig {
+  @IsOptional()
+  @IsString()
+  BACKEND_PROTOCOL: string;
+
   @IsString()
   BACKEND_HOST: string;
 
+  @IsOptional()
   @IsNumber()
   BACKEND_PORT: number;
 

@@ -58,7 +58,7 @@ WORKDIR /home/app
 RUN apk add --no-cache libc6-compat
 
 # Copy only the necessary files
-COPY --chown=node:node --from=build /home/app/dist dist
+COPY --chown=node:node --from=build /home/app/dist ./dist
 COPY ./frontend/nginx.conf /etc/nginx/conf.d/default.conf
 
 # Set Docker as non-root user

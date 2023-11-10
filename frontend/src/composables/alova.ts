@@ -2,11 +2,21 @@ import { createAlova } from 'alova';
 import GlobalFetch from 'alova/GlobalFetch';
 import VueHook from 'alova/vue';
 
-const { BACKEND_HOST, BACKEND_PORT } = import.meta.env;
+const { BACKEND_PROTOCOL, BACKEND_HOST, BACKEND_PORT } = import.meta.env;
+
+const BACKEND_URL = new URL('http://localhost:3000');
+
+BACKEND_URL.protocol = BACKEND_PROTOCOL ?? BACKEND_URL.protocol;
+BACKEND_URL.host = BACKEND_HOST;
+BACKEND_URL.port = (
+  BACKEND_PORT
+    ? ([80, 443].includes(BACKEND_PORT) ? '' : BACKEND_PORT)
+    : BACKEND_URL.port
+);
 
 export const alovaInstance = createAlova({
   // Suppose we need to interact with the server for this domain
-  baseURL: `http://${BACKEND_HOST}:${BACKEND_PORT}`,
+  baseURL: BACKEND_URL.href.replace(/\/$/, ''),
 
   // Introduce VueHook under the vue project, which can help us create request-related states that can be managed by alova using vue's ref function
   statesHook: VueHook,
