@@ -7,15 +7,15 @@ class RootEnvironmentConfig {
   @IsNumber()
   BACKEND_PORT: number;
 
-  @IsString()
   @IsOptional()
+  @IsString()
   FRONTEND_PROTOCOL: string;
 
   @IsString()
   FRONTEND_HOST: string;
 
-  @IsNumber()
   @IsOptional()
+  @IsNumber()
   FRONTEND_PORT: number;
 }
 
