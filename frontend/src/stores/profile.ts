@@ -54,7 +54,7 @@ export const useProfileStore = defineStore('profile', () => {
           'Content-Type': 'application/json;charset=UTF-8'
         },
         credentials: 'include'
-      });
+      }).send();
 
       profile.value = null;
 

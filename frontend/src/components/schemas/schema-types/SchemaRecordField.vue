@@ -40,8 +40,10 @@ function render() {
     return h('div', {
       class: 'schema-record-field',
       selected: field === selectedType.value || null,
-      onDblclick(e) {
-        selectedType.value = field;
+      onClick(e) {
+        if (e.target == field.el) {
+          selectedType.value = field;
+        }
       },
       ...getErrorAttrs(recordFieldError),
       ref: (el) => {
@@ -126,7 +128,7 @@ render
     &.schema-record-field-name
       position relative
       flex 1
-      width 80px
+      min-width 80px
       line-height 28px
       outline none
 

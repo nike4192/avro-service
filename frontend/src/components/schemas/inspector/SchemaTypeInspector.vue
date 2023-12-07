@@ -114,6 +114,7 @@ aside.schema-panel-inspector
   flex-direction column
   width 300px
   background-color var(--color-background-soft)
+  overflow-y auto
 
   .inspector-row
     display flex

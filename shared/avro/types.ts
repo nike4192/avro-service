@@ -278,7 +278,7 @@ class Type {
       )
     }
 
-    if (schema === undefined) {
+    if (schema === undefined || schema === null) {
       return;
     }
 
@@ -674,7 +674,7 @@ class FixedType extends Type {
 
 /** Avro array. Represented as vanilla arrays. */
 class ArrayType extends Type {
-
+  typeName = 'array';
   itemsType: any;
   // _branchConstructor: any;
 

@@ -111,7 +111,7 @@ function fitElements(rootEl, schema) {
 
     const collectionCenter = collection.superBox.getCenter(new Vector2(0, 0));
     for (const box of collection.boxes) {
-      box.el.style.translate = `${box.left - collectionCenter.x}px ${box.top - collectionCenter.y}px`;
+      box.el.style.translate = `${box.left}px ${box.top}px`;
     }
   }
 }

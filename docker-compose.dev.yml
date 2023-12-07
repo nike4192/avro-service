@@ -17,10 +17,9 @@ services:
       dockerfile: ./backend/Dockerfile
       target: dev
     volumes:
-      - ./backend:/home/app
       - ./shared:/home/shared
+      - ./backend:/home/app
       - /home/app/node_modules
-      - /home/app/dist
     ports:
       - ${BACKEND_PORT}:3000
     networks:
@@ -39,7 +38,6 @@ services:
       - ./frontend:/home/app
       - ./shared:/home/shared
       - /home/app/node_modules
-      - /home/app/dist
     ports:
       - ${FRONTEND_PORT}:5173
     networks:
