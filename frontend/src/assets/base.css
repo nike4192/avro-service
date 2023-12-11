@@ -69,6 +69,7 @@
   --color-text-2: var(--vt-c-text-light-2);
 
   --section-gap: 160px;
+  --scrollbar-size: 12px;
 }
 
 /**

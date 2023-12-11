@@ -1,0 +1,91 @@
+#!/bin/bash
+# This file must be used with "source bin/activate" *from bash*
+# you cannot run it directly
+
+deactivate () {
+    # reset old environment variables
+    if [ -n "${_OLD_VIRTUAL_PATH:-}" ] ; then
+        PATH="${_OLD_VIRTUAL_PATH:-}"
+        export PATH
+        unset _OLD_VIRTUAL_PATH
+    fi
+
+    if [ -n "${_OLD_DOCKER_VENV:-}" ] ; then
+        DOCKER_VENV="${_OLD_DOCKER_VENV:-}"
+        export DOCKER_VENV
+        unset _OLD_DOCKER_VENV
+    fi
+
+    # This should detect bash and zsh, which have a hash command that must
+    # be called to get it to forget past commands.  Without forgetting
+    # past commands the $PATH changes we made may not be respected
+    if [ -n "${BASH:-}" -o -n "${ZSH_VERSION:-}" ] ; then
+        hash -r
+    fi
+
+    if [ -n "${_OLD_VIRTUAL_PS1:-}" ] ; then
+        PS1="${_OLD_VIRTUAL_PS1:-}"
+        export PS1
+        unset _OLD_VIRTUAL_PS1
+    fi
+
+    unset DOCKER_VIRTUAL_ENV
+    if [ ! "${1:-}" = "nondestructive" ] ; then
+    # Self destruct!
+        unset -f deactivate
+    fi
+}
+
+get_compose_environments() {
+    compose_files="${DOCKER_VIRTUAL_ENV}/docker-compose*"
+    echo "$(ls $compose_files | sed -nE 's/^.*docker-compose\.(.*)\.ya?ml$/\1/p')"
+}
+
+SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+DOCKER_VIRTUAL_ENV="$(dirname $SCRIPT_DIR)"
+
+readarray -d $'\n' -t environments < <(get_compose_environments)
+
+if [[ $# -ne 0 || -n "${DOCKER_VENV:-}" && " ${environments[*]} " =~ " $DOCKER_VENV " ]] ; then
+    if [[ $# -ne 0 && " ${environments[*]} " =~ " $1 " || $# -eq 0 ]] ; then
+        # unset irrelevant variables
+        deactivate nondestructive
+
+        export DOCKER_VIRTUAL_ENV
+
+        if [ $# -ne 0 ] ; then
+            _OLD_DOCKER_VENV="$DOCKER_VENV"
+            DOCKER_VENV=$1
+            export DOCKER_VENV
+        fi
+
+        _OLD_VIRTUAL_PATH="$PATH"
+        PATH="$SCRIPT_DIR:$PATH"
+        export PATH
+
+        if [ -z "${DOCKER_VIRTUAL_ENV_DISABLE_PROMPT:-}" ] ; then
+            _OLD_VIRTUAL_PS1="${PS1:-}"
+            if [ "x(docker-venv:${DOCKER_VENV}) " != x ] ; then
+                PS1="(docker-venv:${DOCKER_VENV}) ${PS1:-}"
+            else
+                PS1="(`basename \"$DOCKER_VIRTUAL_ENV\"`)$PS1"
+            fi
+            export PS1
+        fi
+
+        # This should detect bash and zsh, which have a hash command that must
+        # be called to get it to forget past commands.  Without forgetting
+        # past commands the $PATH changes we made may not be respected
+        if [ -n "${BASH:-}" -o -n "${ZSH_VERSION:-}" ] ; then
+            hash -r
+        fi
+    else
+        >&2 printf "\"$1\" is wrong environment\nPlease pass one of environments: $(printf "\n- %s" ${environments[@]})\n"
+    fi
+else
+  >&2 printf "Please pass one of environments: $(printf "\n- %s" ${environments[@]})\n"
+
+  # clear variables
+  unset SCRIPT_DIR DOCKER_VIRTUAL_ENV environments
+  unset -f deactivate get_compose_environments
+fi

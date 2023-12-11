@@ -109,7 +109,9 @@ function fitElements(rootEl, schema) {
     const collection = new BoundingBoxCollection();
     makeTree(schema, collection, new Vector2(0, 0));
 
-    const collectionCenter = collection.superBox.getCenter(new Vector2(0, 0));
+    rootEl.style.width = collection.superBox.width + 'px';
+    rootEl.style.height = collection.superBox.height + 'px';
+
     for (const box of collection.boxes) {
       box.el.style.translate = `${box.left}px ${box.top}px`;
     }
@@ -162,6 +164,4 @@ render
 .schema-tree
   position: relative
   margin auto
-  top 50%
-  width 0
 </style>

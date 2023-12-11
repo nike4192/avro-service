@@ -12,6 +12,7 @@ import DocumentationInspectorProps from '@/components/schemas/inspector/props/Do
 import { PRIMITIVE_TYPES, Type } from '~shared/avro/types'
 import ArrayInspectorProps from '@/components/schemas/inspector/props/ArrayInspectorProps.vue'
 import LogicalTypeInspectorProps from '@/components/schemas/inspector/props/LogicalTypeInspectorProps.vue'
+import SchemaNamespaceInspectorProps from '@/components/schemas/inspector/props/SchemaNamespaceInspectorProps.vue'
 
 const store = useSchemaStore()
 const { selectedType } = storeToRefs(store)
@@ -19,6 +20,7 @@ const { selectedType } = storeToRefs(store)
 const inspectorTypeProps = {
   record: {
     props: [
+      { component: SchemaNamespaceInspectorProps },
       { component: SchemaNameInspectorProps },
       { component: RecordInspectorProps },
       { component: DocumentationInspectorProps }
@@ -107,14 +109,18 @@ aside.schema-panel-inspector
 </template>
 
 <style lang='stylus'>
+@import '../../../assets/scrollbar.styl'
+
 .schema-panel-inspector
-  padding 8px 16px
+  scrollbar(var(--color-background-soft), var(--color-border))
+  padding 8px calc(16px - var(--scrollbar-size)) 8px 16px
   position relative
   display flex
   flex-direction column
+  flex-shrink 0
   width 300px
   background-color var(--color-background-soft)
-  overflow-y auto
+  overflow-y scroll
 
   .inspector-row
     display flex

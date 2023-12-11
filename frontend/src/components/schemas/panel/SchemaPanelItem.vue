@@ -72,7 +72,7 @@ div.schema-panel-item(
 
 <style lang='stylus'>
 .schema-panel-item
-  margin 12px
+  margin 12px 4px
   padding 12px 18px
   border 1px solid var(--color-border)
   border-radius 24px
@@ -93,11 +93,13 @@ div.schema-panel-item(
       display none
 
   .versions
-    margin-top 8px
+    margin-top 12px
+    margin-bottom -8px
 
     .version
       display inline-block
       margin-right 8px
+      margin-bottom 8px
       padding 4px 10px
       border 1px solid var(--color-border)
       border-radius 16px

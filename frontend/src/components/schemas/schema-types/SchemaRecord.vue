@@ -51,17 +51,20 @@ function render() {
               }
             }
           },
-          h(RecordTypeIcon, { class: 'icon' }),
-          h('div', {
-            class: 'schema-record-name',
-            ...getErrorAttrs(recordNameError),
-            contenteditable: true,
-            onInput(e) {
-              record.name = e.target.textContent
-              schemaTreeRerender.rerender()
-            },
-            ...zIndexFixEventListeners('.schema-tree')
-          }, record.name)
+          [
+            h(RecordTypeIcon, { class: 'icon' }),
+            h('div', {
+              class: 'schema-record-name',
+              spellcheck: false,
+              ...getErrorAttrs(recordNameError),
+              contenteditable: true,
+              onInput(e) {
+                record.name = e.target.textContent
+                schemaTreeRerender.rerender()
+              },
+              ...zIndexFixEventListeners('.schema-tree')
+            }, record.name)
+          ]
         ),
         h(SchemaRecordFields, {
           type: record,
@@ -94,7 +97,6 @@ render
     border-radius 16px
 
 .schema-record
-  margin auto
   padding 4px
   position absolute
   min-width 220px

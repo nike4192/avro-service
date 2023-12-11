@@ -172,8 +172,11 @@ function schemaViewBoxMouseDown(e) {
 </template>
 
 <style lang='stylus'>
+@import '../../assets/scrollbar.styl'
+
 .schema-view-box
   flex 1
+  min-width 300px
   display flex
   flex-direction column
 
@@ -213,6 +216,9 @@ function schemaViewBoxMouseDown(e) {
         line-height 1rem
 
   .view-container
-    flex 1
-    overflow auto
+    scrollbar(var(--color-background), var(--color-background-mute))
+    padding 30px
+    display grid
+    height 100%
+    overflow-y auto
 </style>

@@ -39,6 +39,7 @@ model AvroSchemaVersion {
   createdById String
   base        AvroSchema @relation(fields: [baseId], references: [id], onDelete: Cascade)
   baseId      String
+  isPushed    Boolean    @default(false) // pushed to gitlab
 
   @@unique([createdById, baseId, number])
 }

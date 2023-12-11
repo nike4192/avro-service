@@ -8,6 +8,7 @@ import { UserModule } from '@/user/user.module';
 import { JwtAuthGuard } from '@/auth/guards/jwt-auth.guard';
 import { AvroSchemaModule } from '@/avro-schema/avro-schema.module';
 import { validate } from '@/env.validation'
+import { GitlabModule } from '@/gitlab/gitlab.module'
 
 @Module({
   imports: [
@@ -16,7 +17,8 @@ import { validate } from '@/env.validation'
     }),
     AuthModule,
     UserModule,
-    AvroSchemaModule
+    AvroSchemaModule,
+    GitlabModule,
   ],
   controllers: [AppController],
   providers: [

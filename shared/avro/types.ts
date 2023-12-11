@@ -1,4 +1,5 @@
 import * as utils from './utils';
+import { isValidName } from './utils'
 
 class JsonError {
   message: string;
@@ -916,6 +917,14 @@ function getTypeBucket(type) {
 function maybeQualify(name, ns, opts, path) {
   const unqualified = utils.unqualify(name);
   // Primitives are always in the global namespace.
+
+  // TODO: Fix if it bug
+  ns.split('.').forEach(function (part) {
+    if (part && !isValidName(part)) {
+      throw new JsonError(`invalid namespace: ${ns}`, [...path, 'namespace'])
+    }
+  });
+
   try {
     return isPrimitive(unqualified) ? unqualified : utils.qualify(name, ns);
   } catch (e) {

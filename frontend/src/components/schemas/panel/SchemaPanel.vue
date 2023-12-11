@@ -38,9 +38,12 @@ aside.schema-panel
 </template>
 
 <style lang='stylus'>
+@import "../../../assets/scrollbar.styl"
+
 aside.schema-panel
   display flex
   flex-direction column
+  flex-shrink 0
   width 300px
   height 100%
   background-color var(--color-background-soft)
@@ -49,8 +52,13 @@ aside.schema-panel
     padding 4px 16px
 
   hr
-    margin 0 16px
+    margin 0 8px
     border none
     height 1px
     background-color var(--color-border)
+
+  .schema-panel-container
+    scrollbar(var(--color-background-soft), var(--color-border))
+    padding-left var(--scrollbar-size)
+    overflow-y scroll
 </style>

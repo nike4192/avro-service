@@ -1,0 +1,3 @@
+#!/bin/bash
+
+docker compose -f "docker-compose.$DOCKER_VENV.yml" up --build --no-deps $1 -d

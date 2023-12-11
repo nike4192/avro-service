@@ -11,7 +11,7 @@ import {
 } from '@nestjs/common'
 import { AvroSchemaService,  } from './avro-schema.service';
 import { CreateAvroSchemaDto } from './dto/create-avro-schema.dto';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { JwtAuthGuard } from '@/auth/guards/jwt-auth.guard';
 import { ApiBearerAuth, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import { UpdateAvroSchemaDto } from './dto/update-avro-schema.dto'
 
@@ -33,11 +33,13 @@ export class AvroSchemaController {
     @Param('schemaName') schemaName: string,
     @Body() createAvroSchemaDto: CreateAvroSchemaDto
   ) {
-    return await this.avroSchemaService.create(
+    const { id, number } = await this.avroSchemaService.create(
       req.user.id,
       schemaName,
       createAvroSchemaDto
     );
+
+    return { id, number };
   }
 
   @ApiParamSchemaName()

@@ -17,7 +17,11 @@ COPY --chown=node:node ./backend /home/app
 COPY --chown=node:node ./shared /home/shared
 
 # Install dependencies
+COPY --chown=node:node ./backend/package.json /home/app/package.json
 RUN yarn --frozen-lockfile
+
+# Generate prisma
+RUN npx prisma generate
 
 # Set Docker as a non-root user
 USER node
@@ -66,5 +70,5 @@ COPY --chown=node:node --from=build /home/app/node_modules node_modules
 
 # Set Docker as a non-root user
 USER node
-# RUN tail -f /dev/null
+
 CMD ["node", "-r", "./tsconfig-paths-bootstrap.js", "dist/app/src/main.js"]

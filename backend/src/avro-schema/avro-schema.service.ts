@@ -2,13 +2,46 @@ import * as jsondiffpatch from 'jsondiffpatch';
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateAvroSchemaDto } from './dto/create-avro-schema.dto';
 import { PrismaService } from '@/prisma/prisma.service';
-import { AvroSchemaVersion } from '@prisma/client';
+import { AvroSchema, AvroSchemaVersion } from '@prisma/client'
 import { UpdateAvroSchemaDto } from './dto/update-avro-schema.dto'
 import { Type } from '~shared/avro/types'
+import { GitlabService } from '@/gitlab/gitlab.service'
 
 @Injectable()
 export class AvroSchemaService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private gitlabService: GitlabService
+  ) {}
+
+  private validateSchemaBeforeCreate(
+    schema: any,
+    avroSchema: AvroSchema & { versions: AvroSchemaVersion[] }
+  ) {
+    const latestVersionNumber = Math.max(
+      0,
+      ...avroSchema.versions.map(v => v.number)
+    );
+
+    if (latestVersionNumber) {
+      const latestVersion = avroSchema.versions.find(
+        v => v.number === latestVersionNumber
+      );
+
+      const delta = jsondiffpatch.diff(latestVersion.schema, schema);
+
+      if (!delta) {
+        throw new BadRequestException('schema is the same as in the previous version');
+      }
+    }
+
+    const errors = Type.validate(schema);
+
+    if (errors.length) {
+      throw new BadRequestException({ errors });
+    }
+  }
+
   async create(
     userId: string,
     schemaName: string,
@@ -38,42 +71,38 @@ export class AvroSchemaService {
       })
     }
 
+    // Important thing
+    this.validateSchemaBeforeCreate(schema, avroSchema);
 
     const latestVersionNumber = Math.max(
       0,
       ...avroSchema.versions.map(v => v.number)
     );
 
-    if (latestVersionNumber) {
-      const latestVersion = avroSchema.versions.find(
-        v => v.number === latestVersionNumber
-      );
-
-      const delta = jsondiffpatch.diff(latestVersion.schema, schema);
-
-      if (!delta) {
-        throw new BadRequestException('schema is the same as in the previous version');
-      }
-    }
-
-    const errors = Type.validate(schema);
-
-    if (errors.length) {
-      throw new BadRequestException({ errors });
-    }
-
-    return this.prisma.avroSchemaVersion.create({
+    let avroSchemaVersion = await this.prisma.avroSchemaVersion.create({
       data: {
         baseId: avroSchema.id,
         schema,
         createdById: userId,
         number: latestVersionNumber + 1,
-      },
-      select: {
-        id: true,
-        number: true,
       }
-    });
+    })
+
+    try {
+      await this.gitlabService.pushSchema(avroSchemaVersion);
+      avroSchemaVersion = await this.prisma.avroSchemaVersion.update({
+        where: {
+          id: avroSchemaVersion.id,
+        },
+        data: {
+          isPushed: true,
+        }
+      });
+    } catch (e) {
+      // console.error(e);
+    }
+
+    return avroSchemaVersion;
   }
 
   async findAll(userId: string) {

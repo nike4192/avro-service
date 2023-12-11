@@ -1,15 +1,16 @@
 <script setup lang='ts'>
 
+import TimesCircleIcon from 'primevue/icons/timescircle'
 import Chip from 'primevue/chip'
 import AutoComplete from 'primevue/autocomplete'
 import { getType } from '@/utils/schemas'
 import { ref, watch } from 'vue'
-import { PRIMITIVE_TYPES, Type, TYPE_NAMES } from '~shared/avro/types'
+import { Type, TYPE_NAMES } from '~shared/avro/types'
 import { useHardRerender } from '@/composables/hardRerender'
 import { HardRerender } from '@/types/schema'
 
 const props = defineProps({
-  type: Object
+  type: Array
 });
 
 const schemaTreeRerender = useHardRerender(HardRerender.SchemaTree);
@@ -30,18 +31,18 @@ function onRemoveType(value) {
   if (indexOf !== -1) {
     props.type.splice(indexOf, 1);
   }
-  schemaTreeRerender.rerender();
+  schemaTreeRerender.rerender()
 }
 
 function onAutoComplete({ value }) {
-  props.type.push(Type.createType(value));
+  props.type.push(Type.createType(value).type);
   console.log(props.type);
   suggestionValue.value = '';
   schemaTreeRerender.rerender();
 }
 
 watch(props.type, () => {
-  console.log('Union', props.type);
+  console.log('Union', props.type.map(getType));
   suggestionTypes.value = [...TYPE_NAMES].filter(t => !props.type.includes(t));
 }, {
   immediate: true
@@ -55,11 +56,13 @@ watch(props.type, () => {
   .row-container
     .union-types
       Chip(
-        v-for='t of type'
+        v-for='(t, index) of type'
         :removable='true'
+        :key="index"
         :label='getType(t)'
-        @remove='onRemoveType(t)'
       )
+        template(#removeicon)
+          TimesCircleIcon.p-icon.p-chip-remove-icon(@click="onRemoveType(t)")
     AutoComplete(
       :delay='0'
       v-model='suggestionValue'
