@@ -18,6 +18,7 @@ services:
       - main
 
   db:
+    env_file: '.env'
     image: postgres:16-alpine
     shm_size: 512mb
     restart: unless-stopped
