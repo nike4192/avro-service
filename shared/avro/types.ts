@@ -11,6 +11,8 @@ class JsonError {
   }
 }
 
+class ValidationError extends JsonError {}
+
 /*
 declare namespace schema {
   export type AvroSchema = DefinedType | DefinedType[];
@@ -90,7 +92,6 @@ class Type {
   doc: string;
 
   constructor(schema?, opts?, path?) {
-    // console.log(schema, path);
     let type;
     if (LOGICAL_TYPE) {
       type = LOGICAL_TYPE;
@@ -98,6 +99,21 @@ class Type {
       LOGICAL_TYPE = null;
     } else {
       type = this;
+    }
+
+    const validation = opts?.validation;
+    if (validation) {
+      const [typeValidation, isExcept] = checkIfExcept('*', validation, path);
+      if (typeValidation && !isExcept) {
+        if (typeValidation.name?.regexp) {
+          const regexp = new RegExp(typeValidation.name?.regexp);
+          if (!regexp.test(schema.name)) {
+            opts.errors.push(
+              new JsonError(typeValidation.name?.message, [...path, 'name'])
+            );
+          }
+        }
+      }
     }
 
     // Lazily instantiated hash string. It will be generated the first time the
@@ -224,10 +240,10 @@ class Type {
     return false;
   };
 
-  static validate(schema: any) {
+  static validate(schema: any, options = {}) {
     const errors = [];
     try {
-      const opts = { errors: [] };
+      const opts = { errors: [], ...options };
       Type.forSchema(schema, opts);
       if (opts.errors && opts.errors.length) {
         errors.push(...opts.errors);
@@ -474,6 +490,19 @@ class EnumType extends Type {
   constructor(schema, opts, path) {
     super(schema, opts, path);
 
+    const validation = opts?.validation;
+
+    if (validation) {
+      const [typeValidation, isExcept] = checkIfExcept('enum', validation, path);
+      if (typeValidation && !isExcept) {
+        if (typeValidation?.doc?.includes('required') && !schema.doc) {
+          opts.errors.push(
+            new JsonError('doc property in enum is required', [...path, 'doc'])
+          );
+        }
+      }
+    }
+
     if (!Array.isArray(schema.symbols) || !schema.symbols.length) {
       opts.errors.push(
         new JsonError(`invalid enum symbols: ${schema.symbols}`, path)
@@ -530,6 +559,16 @@ class RecordType extends Type {
     // record's name.
     opts = opts || {};
 
+    const validation = opts?.validation;
+    let [typeValidation, isExcept] = checkIfExcept('record', validation, path);
+    if (typeValidation &&!isExcept) {
+      if (typeValidation?.doc?.includes('required') && !schema.doc) {
+        opts.errors.push(
+          new JsonError('doc property in record is required', [...path, 'doc'])
+        )
+      }
+    }
+
     // Save the namespace to restore it as we leave this record's scope.
     const namespace = opts.namespace;
     if (schema.namespace !== undefined) {
@@ -585,6 +624,15 @@ class RecordType extends Type {
   }
 }
 
+function checkIfExcept(type, validation, path) {
+  const typeValidation = validation.types?.[type];
+  let isExcept = typeValidation?.except?.includes(path.join('.'));
+  if (!isExcept && typeof path[path.length - 1] === 'number') {
+    isExcept = typeValidation?.except?.includes([...path.slice(0, -1), '*'].join('.'));
+  }
+  return [typeValidation, isExcept];
+}
+
 /** A record field. */
 class Field {
   name: any;
@@ -594,8 +642,36 @@ class Field {
   _order: any;
   // defaultValue: any;
 
-  constructor(schema, opts, path) {
+  constructor(schema: any, opts: any, path: any) {
     const name = schema.name;
+
+    const validation = opts?.validation;
+    if (validation) {
+      {
+        let [typeValidation, isExcept] = checkIfExcept('record', validation, path);
+        if (typeValidation && !isExcept) {
+          if (typeValidation.field?.doc?.includes('required') && !schema.doc) {
+            opts.errors.push(
+              new JsonError('doc property in field is required', [...path, 'doc'])
+            )
+          }
+        }
+      }
+      {
+        const [typeValidation, isExcept] = checkIfExcept('*', validation, path);
+        if (typeValidation && !isExcept) {
+          if (typeValidation.name?.regexp) {
+            const regexp = new RegExp(typeValidation.name?.regexp);
+            if (!regexp.test(schema.name)) {
+              opts.errors.push(
+                new JsonError(typeValidation.name?.message, [...path, 'name'])
+              );
+            }
+          }
+        }
+      }
+    }
+
     if (typeof name != 'string' || !utils.isValidName(name)) {
       opts.errors.push(
         new JsonError(`invalid field name: ${name}`, [...path, 'name'])
@@ -687,7 +763,7 @@ class ArrayType extends Type {
         new JsonError(`missing array items: ${schema}`, path)
       )
     }
-    this.itemsType = Type.forSchema(schema.items, opts, path);
+    this.itemsType = Type.forSchema(schema.items, opts, [...path, 'items']);
     // this._branchConstructor = this._createBranchConstructor();
   }
 }
@@ -938,4 +1014,4 @@ function isPrimitive(typeName) {
   return type && type.prototype instanceof PrimitiveType;
 }
 
-export { JsonError, TYPES, PRIMITIVE_TYPES, COMPLEX_TYPES, TYPE_NAMES, Type };
+export { JsonError, ValidationError, TYPES, PRIMITIVE_TYPES, COMPLEX_TYPES, TYPE_NAMES, Type };

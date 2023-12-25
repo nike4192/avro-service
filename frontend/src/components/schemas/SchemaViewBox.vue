@@ -1,11 +1,17 @@
 <script setup lang='ts'>
 
-import { TrashIcon, ArrowUpCircleIcon, PlusCircleIcon } from '@heroicons/vue/24/outline'
+import {
+  ExclamationCircleIcon,
+  TrashIcon,
+  ArrowUpCircleIcon,
+  PlusCircleIcon
+} from '@heroicons/vue/24/outline'
+
 import '@/assets/button.styl'
 import { useSchemaStore } from '@/stores/schema'
 import { storeToRefs } from 'pinia'
 import { useRouter } from 'vue-router'
-import { computed, onUpdated, ref } from 'vue'
+import { computed, onUpdated, ref, watch } from 'vue'
 import type { Ref } from 'vue'
 import SchemaTree from '@/components/schemas/tree/SchemaTree.vue'
 import LogoutButton from '@/components/buttons/LogoutButton.vue'
@@ -26,6 +32,9 @@ const store = useSchemaStore();
 const { selectedType, selectedSchema, selectedVersion } = storeToRefs(store);
 
 const schema = computed(() => selectedVersion.value?.schema);
+const errors = ref([]);
+
+watch(errors, () => console.log(errors.value));
 
 async function onSchemaNameKeydown(e) {
   switch (e.key) {
@@ -168,13 +177,22 @@ function schemaViewBoxMouseDown(e) {
         PlusCircleIcon.icon
     LogoutButton.view-header-button
   .view-container(ref='viewContainerRef', @mousedown='schemaViewBoxMouseDown')
-    SchemaTree(:schema='schema')
+    SchemaTree(
+      :schema='schema',
+      v-model:errors='errors'
+    )
+  .view-footer-container
+    template(v-if='errors.length')
+      .errors-info
+        ExclamationCircleIcon.icon.errors-count
+        span {{ errors.length }}
 </template>
 
 <style lang='stylus'>
 @import '../../assets/scrollbar.styl'
 
 .schema-view-box
+  position relative
   flex 1
   min-width 300px
   display flex
@@ -221,4 +239,19 @@ function schemaViewBoxMouseDown(e) {
     display grid
     height 100%
     overflow-y auto
+
+  .view-footer-container
+    position absolute
+    bottom 8px
+    right 8px
+    z-index 100
+
+    .errors-info
+      padding 2px 6px
+      float right
+      display flex
+      color var(--vt-c-red)
+      .icon.errors-count
+        margin-right 4px
+        width 18px
 </style>

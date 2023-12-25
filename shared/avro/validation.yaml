@@ -1,0 +1,23 @@
+types:
+  "*":
+    name:
+      regexp: '^[a-zA-Z0-9-_]+$'  # unnecessary, because validation of avro specification is implemented
+      message: 'invalid name: ^[a-zA-Z0-9-_]+$'
+  record:
+    except:
+      - $.fields.*  # system_info, key, payload
+      - $.fields.0.type   # system_record
+      - $.fields.0.type.fields.*
+      - $.fields.1.type   # key_record
+      - $.fields.1.type.fields.*
+      - $.fields.2.type.1   # payload_record
+    doc:
+      - required
+    field:
+      doc:
+        - required
+  enum:
+    except:
+      - $.fields.0.type.fields.1.type  # operations
+    doc:
+      - required

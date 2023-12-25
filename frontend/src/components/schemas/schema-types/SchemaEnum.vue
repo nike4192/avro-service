@@ -22,10 +22,14 @@ const props = defineProps({
 
 function render() {
   if (props.enum) {
+    const { path, errors } = props.enum;
+    const enumError = findError(errors, path, 1);
+
     const schemaEnumTitleContainerRef = ref();
     return h('div', {
       class: 'schema-enum',
       selected: selectedType.value === props.enum,
+      ...getErrorAttrs(enumError),
       ref: (el) => { props.enum.el = el; }
     }, h('div', {
         class: 'schema-enum-title-container',
@@ -39,7 +43,6 @@ function render() {
       h(EnumTypeIcon, { class: 'icon', title: 'Enum' }),
       h('div', {
         class: 'schema-enum-name',
-        // ...getErrorAttrs(recordNameError),
         contenteditable: true,
         onInput(e) {
           props.enum.name = e.target.textContent;

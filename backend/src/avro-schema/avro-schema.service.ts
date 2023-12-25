@@ -1,3 +1,7 @@
+import { readFileSync } from 'fs';
+import * as process from 'process'
+import * as yaml from 'js-yaml';
+import { join } from 'path';
 import * as jsondiffpatch from 'jsondiffpatch';
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateAvroSchemaDto } from './dto/create-avro-schema.dto';
@@ -7,12 +11,21 @@ import { UpdateAvroSchemaDto } from './dto/update-avro-schema.dto'
 import { Type } from '~shared/avro/types'
 import { GitlabService } from '@/gitlab/gitlab.service'
 
+const YAML_CONFIG_FILENAME = 'validation.yaml';
+
 @Injectable()
 export class AvroSchemaService {
+
+  validation: {}
+
   constructor(
     private prisma: PrismaService,
     private gitlabService: GitlabService
-  ) {}
+  ) {
+    this.validation = yaml.load(
+      readFileSync(join(process.cwd(), '../shared/avro', YAML_CONFIG_FILENAME), 'utf8'),
+    ) as Record<string, any>;
+  }
 
   private validateSchemaBeforeCreate(
     schema: any,
@@ -35,7 +48,7 @@ export class AvroSchemaService {
       }
     }
 
-    const errors = Type.validate(schema);
+    const errors = Type.validate(schema, { validation: this.validation });
 
     if (errors.length) {
       throw new BadRequestException({ errors });

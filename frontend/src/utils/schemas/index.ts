@@ -67,38 +67,49 @@ function removeRecord(schema, record) {
   }
 }
 
-function walkThroughComplexTypes(schema, cb, path = ['$']) {
+function walkThroughComplexTypes(schema, cb, path = ['$'], typeName = null) {
   if (schema) {
-    const typeName = Type.getType(schema);
-
-    if (COMPLEX_TYPES.includes(typeName)) {
+    if (typeName) {
       cb(schema, path);
-    }
-
-    switch (typeName) {
-      case 'array':
+      if (typeName === 'field') {
+        walkThroughComplexTypes(schema.type, cb, [...path, 'type']);
+      } else if (typeName === 'array') {
         walkThroughComplexTypes(schema.items, cb, [...path, 'items']);
-        break;
-      case 'union':
-        for (let j = 0; j < schema.length; j++) {
-          const type = schema[j];
-          if (type !== 'null') {
-            if (!Type.getType(type) && Type.getType(type.type)) {
-              walkThroughComplexTypes(type.type, cb, [...path, j, 'type']);
-            } else {
-              walkThroughComplexTypes(type, cb, [...path, j]);
+      } else {
+        throw Error('not implemented');
+      }
+    } else {
+      typeName = Type.getType(schema);
+
+      if (COMPLEX_TYPES.includes(typeName)) {
+        cb(schema, path);
+      }
+
+      switch (typeName) {
+        case 'array':
+          walkThroughComplexTypes(schema, cb, [...path], 'array');
+          break;
+        case 'union':
+          for (let j = 0; j < schema.length; j++) {
+            const type = schema[j];
+            if (type !== 'null') {
+              if (!Type.getType(type) && Type.getType(type.type)) {
+                walkThroughComplexTypes(type.type, cb, [...path, j, 'type']);
+              } else {
+                walkThroughComplexTypes(type, cb, [...path, j]);
+              }
             }
           }
-        }
-        break;
-      case 'record':
-        for (let i = 0; i < schema.fields.length; i++) {
-          const field = schema.fields[i];
-          if (field.type) {
-            walkThroughComplexTypes(field.type, cb, [...path, 'fields', i, 'type']);
+          break;
+        case 'record':
+          for (let i = 0; i < schema.fields.length; i++) {
+            const field = schema.fields[i];
+            if (field.type) {
+              walkThroughComplexTypes(field, cb, [...path, 'fields', i], 'field');
+            }
           }
-        }
-        break;
+          break;
+      }
     }
   }
 }

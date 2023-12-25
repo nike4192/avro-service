@@ -1,7 +1,8 @@
 <script setup lang='ts'>
 import { h, nextTick, ref, toRaw } from 'vue'
 import { BoundingBox, BoundingBoxCollection, Vector2 } from '@/core/math'
-import { COMPLEX_TYPES, JsonError, Type } from '~shared/avro/types'
+import { COMPLEX_TYPES, JsonError, ValidationError, Type } from '~shared/avro/types'
+import validation from '~shared/avro/validation.yaml'
 import SchemaRecord from '@/components/schemas/schema-types/SchemaRecord.vue'
 import { useHardRerender } from '@/composables/hardRerender'
 import { HardRerender } from '@/types/schema'
@@ -11,8 +12,11 @@ import SchemaMap from '@/components/schemas/schema-types/SchemaMap.vue'
 import { walkThroughComplexTypes } from '@/utils/schemas'
 
 const props = defineProps({
-  schema: Object
+  schema: Object,
+  errors: Array,
 });
+
+const emit = defineEmits(['update:errors']);
 
 const { flag: rerenderFlag } = useHardRerender(HardRerender.SchemaTree);
 
@@ -104,7 +108,7 @@ function fitElements(rootEl, schema) {
     const parent = rootEl.parentElement;
     const parentRect = parent.getBoundingClientRect();
     const parentBox = BoundingBox.fromDOMRect(parentRect);
-    parentBox.translate(new Vector2(-parentRect.left, -parentRect.top));
+    // parentBox.translate(new Vector2(-parentRect.left, -parentRect.top));
 
     const collection = new BoundingBoxCollection();
     makeTree(schema, collection, new Vector2(0, 0));
@@ -124,19 +128,23 @@ function render() {
   if (schema) {
     window.debug_schema = schema;
 
-    const errors = Type.validate(schema);
+    const errors = Type.validate(schema, { validation });
 
     if (errors.length) {
       console.error(errors);
     }
 
-    const complexTypes = [];
+    emit('update:errors', errors);
+
+    const complexTypes: any[] = [];
     walkThroughComplexTypes(schema, (complexType, path) => {
       const pathString: string = path.join('.');
       complexType = ref(complexType);  // For rerender errors in SchemaRecord
       complexType.value.path = path;
       complexType.value.errors = errors.filter(
-        e => e instanceof JsonError && e.path.join('.').startsWith(pathString)
+        e =>
+          (e instanceof JsonError || e instanceof ValidationError) &&
+          e.path.join('.').startsWith(pathString)
       );
       complexTypes.push(complexType);
     });

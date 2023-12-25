@@ -12,19 +12,19 @@ WORKDIR /home/app
 # Set to dev environment
 ENV NODE_ENV dev
 
-# Copy source code into app folder
-COPY --chown=node:node ./backend /home/app
-COPY --chown=node:node ./shared /home/shared
-
 # Install dependencies
-COPY --chown=node:node ./backend/package.json /home/app/package.json
+COPY ./backend/package.json /home/app/package.json
 RUN yarn --frozen-lockfile
+
+# Copy source code into app folder
+COPY ./backend /home/app
+COPY ./shared /home/shared
 
 # Generate prisma
 RUN npx prisma generate
 
 # Set Docker as a non-root user
-USER node
+#USER node
 
 #
 # 🏡 Production Build
@@ -51,7 +51,7 @@ RUN yarn build
 RUN yarn --frozen-lockfile --production && yarn cache clean
 
 # Set Docker as a non-root user
-USER node
+#USER node
 
 #
 # 🚀 Production Server
@@ -69,6 +69,6 @@ COPY --chown=node:node --from=build /home/app/dist dist
 COPY --chown=node:node --from=build /home/app/node_modules node_modules
 
 # Set Docker as a non-root user
-USER node
+#USER node
 
 CMD ["node", "-r", "./tsconfig-paths-bootstrap.js", "dist/app/src/main.js"]

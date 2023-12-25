@@ -5,6 +5,7 @@ import Chip from 'primevue/chip'
 import AutoComplete from 'primevue/autocomplete'
 import { getType } from '@/utils/schemas'
 import { ref, watch } from 'vue'
+import type { Ref } from 'vue'
 import { Type, TYPE_NAMES } from '~shared/avro/types'
 import { useHardRerender } from '@/composables/hardRerender'
 import { HardRerender } from '@/types/schema'
@@ -16,7 +17,7 @@ const props = defineProps({
 const schemaTreeRerender = useHardRerender(HardRerender.SchemaTree);
 
 // For union
-const suggestionTypes = ref([]);
+const suggestionTypes: Ref<any[]> = ref([]);
 const filteredSuggestionTypes = ref([]);
 const suggestionValue = ref('');
 
@@ -42,7 +43,6 @@ function onAutoComplete({ value }) {
 }
 
 watch(props.type, () => {
-  console.log('Union', props.type.map(getType));
   suggestionTypes.value = [...TYPE_NAMES].filter(t => !props.type.includes(t));
 }, {
   immediate: true

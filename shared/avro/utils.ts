@@ -89,9 +89,16 @@ function unqualify(name) {
 }
 
 
-function findError(errors, path) {
+function escapeRegExp(text: string) {
+  return text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&');
+}
+
+function findError(errors, path, nestedLevel = 0) {
   const pathString = path.join('.');
-  return errors.find(e => e.path.join('.') === pathString);
+  return errors.find(e => nestedLevel
+    ? e.path.join('.').match(escapeRegExp(pathString) + '\.[^.]+'.repeat(nestedLevel) + '$')
+    : e.path.join('.') === pathString
+  );
 }
 
 export {

@@ -32,7 +32,7 @@ function render() {
   const { field, path, errors } = props;
 
   if (field && path && errors) {
-    const recordFieldError = findError(errors, path);
+    const recordFieldError = findError(errors, path, 1);
     const recordFieldNameError = findError(errors, [...path, 'name']);
 
     const typeGetterSetter = closureTypeGetterSetter(field);
@@ -41,8 +41,9 @@ function render() {
       class: 'schema-record-field',
       selected: field === selectedType.value || null,
       onClick(e) {
-        if (e.target == field.el) {
+        if (e.target.closest('.schema-tree')) {
           selectedType.value = field;
+          schemaTreeRerender.rerender();
         }
       },
       ...getErrorAttrs(recordFieldError),
